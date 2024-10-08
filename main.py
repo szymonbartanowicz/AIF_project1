@@ -1,5 +1,6 @@
 import sys
 import os
+import importlib
 from constants import ALGORITHMS, INPUTS_DIR
 
 
@@ -22,6 +23,16 @@ def main():
 
     print(f"Algorithm: {algorithm}")
     print(f"Processing file: {input_file}...")
+
+    try:
+        algorithm_module = importlib.import_module(f"algorithms.{algorithm}")
+        algorithm_module.main(input_path)
+    except ModuleNotFoundError:
+        print(f"Error: The algorithm '{algorithm}' could not be found in the 'algorithms' folder.")
+        sys.exit(1)
+    except AttributeError:
+        print(f"Error: The module 'algorithms.{algorithm}' does not have a 'main' function.")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
