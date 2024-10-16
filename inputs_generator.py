@@ -12,20 +12,18 @@ class MapGenerator:
         return [[random.randint(1, 9) for _ in range(self.size)] for _ in range(self.size)]
 
     def generate_start(self):
-        row = random.randint(0, self.size - 1)
-        col = random.randint(0, self.size - 1)
+        row = 0
+        col = 0
         position = 0
 
         return row, col, position
 
-    def generate_target(self, start):
-        while True:
-            row = random.randint(0, self.size - 1)
-            col = random.randint(0, self.size - 1)
-            position = 8
-            if row != start[0] and col != start[1]:
+    def generate_target(self):
+        row = self.size - 1
+        col = self.size - 1
+        position = 8
 
-                return row, col, position
+        return row, col, position
 
     def save_to_file(self, matrix, start, target, filename):
         with open(filename, 'w') as f:
@@ -49,7 +47,7 @@ def main():
         for i in range(10):
             matrix = generator.generate_matrix()
             start = generator.generate_start()
-            target = generator.generate_target(start)
+            target = generator.generate_target()
             filename = os.path.join(output_dir, f"{size}x{size}_{i + 1}.txt")
             generator.save_to_file(matrix, start, target, filename)
 
