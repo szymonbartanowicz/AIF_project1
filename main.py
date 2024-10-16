@@ -2,7 +2,15 @@ import sys
 import os
 import importlib
 from constants import ALGORITHMS, INPUTS_DIR
+import csv
 
+OUTPUT_FILE = "stats_output.tsv"
+
+def save_stats_to_tsv(algorithm, input_file, stats):
+    with open(OUTPUT_FILE, mode='a', newline='') as file:
+        writer = csv.writer(file, delimiter='\t')
+        writer.writerow([stats[0], stats[1], stats[2], stats[3], algorithm, input_file])
+    print(f"Stats saved to {OUTPUT_FILE}")
 
 def main():
     if len(sys.argv) != 3:
@@ -26,14 +34,18 @@ def main():
 
     try:
         algorithm_module = importlib.import_module(f"algorithms.{algorithm}")
-        algorithm_module.main(input_path)
+        stats = algorithm_module.main(input_path)
+        print(stats)
+
+        # Save the stats to TSV
+        save_stats_to_tsv(algorithm, input_file, stats)
+
     except ModuleNotFoundError:
         print(f"Error: The algorithm '{algorithm}' could not be found in the 'algorithms' folder.")
         sys.exit(1)
     except AttributeError:
         print(f"Error: The module 'algorithms.{algorithm}' does not have a 'main' function.")
         sys.exit(1)
-
 
 if __name__ == "__main__":
     main()

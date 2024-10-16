@@ -47,7 +47,7 @@ def main():
         for i in range(10):
             matrix = generator.generate_matrix()
             start = generator.generate_start()
-            target = generator.generate_target()
+            target = generator.generate_target( )
             filename = os.path.join(output_dir, f"{size}x{size}_{i + 1}.txt")
             generator.save_to_file(matrix, start, target, filename)
 

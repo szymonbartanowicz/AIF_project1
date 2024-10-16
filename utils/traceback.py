@@ -30,6 +30,18 @@ def heuristic1(start, target):
     turns = min(abs(dir_id - o1), 8 - abs(o1 - dir_id))
     return (turns + dist)
 
+def heuristic2(start, target):
+    y1, x1, o1 = start
+    y2, x2, o2 = target
+
+    diffx = x2 - x1
+    diffy = y2 - y1
+
+    dist = max(abs(diffx), abs(diffy))
+
+    return (dist)
+
+
 
 def trace_back(path, search_space, heuristic=False, heuristic_func=heuristic1):
     # uniformed search:
@@ -104,5 +116,5 @@ def trace_back(path, search_space, heuristic=False, heuristic_func=heuristic1):
                 else:
                     print("Traceback failed")
                     break
-
-        print(f"Total Cost: {cost}")
+    
+    return n, cost

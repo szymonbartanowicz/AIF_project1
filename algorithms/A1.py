@@ -55,12 +55,12 @@ def aStar_1(start, target, cols, rows, search_space):
 
     while queue:
 
-        print(f"queue: {queue}")
+        #print(f"queue: {queue}")
         current_tup = min(queue, key=lambda t: t[1])
         queue.remove(current_tup)
 
         current = current_tup[0]
-        print(f"current {current}")
+        #print(f"current {current}")
 
         # check if current is target
         if current[0] == target[0] and current[1] == target[1]:
@@ -70,14 +70,14 @@ def aStar_1(start, target, cols, rows, search_space):
                 current = parent[current]
             path.reverse()
             # path.append(neighbour)
-            print(f"Path found from goal to target with A_Start Search: {path}")
-            return path
+            #print(f"Path found from goal to target with A_Start Search: {path}")
+            return path, len(parent), len(queue)
 
         for neighbour in get_neighbours(current, cols, rows):
             # only use neigbhours that are not yet visited
             if neighbour not in parent:
 
-                print(f"Current neighbour: {neighbour}")
+                #print(f"Current neighbour: {neighbour}")
                 # Calculate tentative g_score (current cost to reach this neighbor)
                 current_g = g_score[current] + distance(current, neighbour, search_space)
 
@@ -140,9 +140,14 @@ def main(input_file):
     print(f"end position: {end_position}")
     print("")
 
-    path = (aStar_1(start_position, end_position, cols, rows, search_space))
+    path,explored,frontier = (aStar_1(start_position, end_position, cols, rows, search_space))
     print(path)
-    trace_back(path, search_space, True, heuristic1)
+    print()
+    depth, cost = trace_back(path, search_space, True, heuristic1)
+    print(f"\nNumber of items in explored list: {explored}")
+    print(f"Number of items in frontier: {frontier}")
+
+    return (depth, cost, explored,explored)
 
 
 

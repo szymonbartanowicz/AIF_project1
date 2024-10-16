@@ -33,8 +33,7 @@ def bfs(start, target, cols, rows):
                         current = parent[current]
                     path.reverse()
                     path.append(neighbour)
-                    print(f"Path found from goal to target with BFS Search: {path}")
-                    return path
+                    return path, len(parent), len(queue)
         print(f"current queue: {queue}")
     return False
 
@@ -80,8 +79,13 @@ def main(input_file):
     print("")
 
     # We start searching bfs
-    path = (bfs(start_position, end_position, cols, rows))
-    trace_back(path, search_space)
+    path, explored, frontier = (bfs(start_position, end_position, cols, rows))
     print(path)
+    print()
+    depth, cost = trace_back(path, search_space)
+    print(f"\nNumber of items in explored list: {explored}")
+    print(f"Number of items in frontier: {frontier}")
+
+    return (depth, cost, explored, explored)
 
 

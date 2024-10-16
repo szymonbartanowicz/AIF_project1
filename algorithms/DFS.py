@@ -34,7 +34,7 @@ def dfs(start, target, cols, rows):
     parent = {start: None}
 
     # recursively check search space
-    return dfs_recursive(start, target, cols, rows, parent)
+    return dfs_recursive(start, target, cols, rows, parent), len(parent)
 
 
 def main(input_file):
@@ -79,7 +79,11 @@ def main(input_file):
     print("")
 
     # We start searching bfs
-    path = (dfs(start_position, end_position, cols, rows))
-    trace_back(path, search_space)
+    path,explored = (dfs(start_position, end_position, cols, rows))
     print(path)
+    depth, cost = trace_back(path, search_space)
+    print(f"\nNumber of items in explored list: {explored}")
+    print(f"Number of items in frontier: Does not apply for DFS")
+
+    return (depth, cost, explored,explored)
 

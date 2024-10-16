@@ -1,112 +1,153 @@
-import heapq
-import math
-
-# Directions: North, Northeast, East, Southeast, South, Southwest, West, Northwest
-DIRECTIONS = [
-    (-1, 0),  # North
-    (-1, 1),  # Northeast
-    (0, 1),  # East
-    (1, 1),  # Southeast
-    (1, 0),  # South
-    (1, -1),  # Southwest
-    (0, -1),  # West
-    (-1, -1)  # Northwest
-]
+from utils.get_neighbours import get_neighbours
+from utils.traceback import trace_back
 
 
-# A* Algorithm
-def astar(grid, start, goal):
-    n, m = len(grid), len(grid[0])
-    (x_start, y_start, orientation_start) = start
-    (x_goal, y_goal, orientation_goal) = goal
+def heuristic2(start, target):
+    y1, x1, o1 = start
+    y2, x2, o2 = target
 
-    # Priority queue (min-heap) for A* frontier
-    frontier = []
-    heapq.heappush(frontier, (0, x_start, y_start, orientation_start))
+    diffx = x2 - x1
+    diffy = y2 - y1
 
-    # Maps to store the cost to reach each node and its previous node for path reconstruction
-    cost_so_far = {}
-    cost_so_far[(x_start, y_start, orientation_start)] = 0
+    dist = max(abs(diffx), abs(diffy))
 
-    came_from = {}
-    came_from[(x_start, y_start, orientation_start)] = None
+    # if diffx == 0:
+    #     if diffy > 0:
+    #         dir_id = 4
+    #     elif diffy <= 0:
+    #         dir_id = 0
+    # elif diffy == 0:
+    #     if diffx > 0:
+    #         dir_id = 2
+    #     elif diffx <= 0:
+    #         dir_id = 6
+    # else:
+    #     if diffx > 0 and diffy > 0:
+    #         dir_id = 3
+    #     elif diffx < 0 and diffy > 0:
+    #         dir_id = 5
+    #     elif diffx < 0 and diffy < 0:
+    #         dir_id = 7
+    #     elif diffx > 0 and diffy < 0:
+    #         dir_id = 1
 
-    while frontier:
-        _, x, y, orientation = heapq.heappop(frontier)
-
-        # Check if we've reached the goal (ignoring orientation if it's irrelevant)
-        if (x, y) == (x_goal, y_goal) and (orientation == orientation_goal or orientation_goal == 8):
-            return reconstruct_path(came_from, start, (x, y, orientation))
-
-        # Explore neighbors
-        for i, (dx, dy) in enumerate(DIRECTIONS):
-            new_x, new_y = x + dx, y + dy
-            new_orientation = i
-
-            if 0 <= new_x < n and 0 <= new_y < m:  # Check boundaries
-                new_cost = cost_so_far[(x, y, orientation)] + grid[new_x][new_y]
-
-                # Consider new state only if it's better (lower cost)
-                if (new_x, new_y, new_orientation) not in cost_so_far or new_cost < cost_so_far[
-                    (new_x, new_y, new_orientation)]:
-                    cost_so_far[(new_x, new_y, new_orientation)] = new_cost
-
-                    # Priority: f = g (cost so far) + h (heuristic)
-                    priority = new_cost + heuristic(new_x, new_y, x_goal, y_goal)
-                    heapq.heappush(frontier, (priority, new_x, new_y, new_orientation))
-
-                    # Track the path
-                    came_from[(new_x, new_y, new_orientation)] = (x, y, orientation)
-
-    # No path found
-    return None
+    #turns = min(abs(dir_id - o1), 8 - abs(o1 - dir_id))
+    return (dist)
 
 
-# Euclidean distance heuristic
-def heuristic(x1, y1, x2, y2):
-    return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+def aStar_2(start, target, cols, rows, search_space):
+    # Check if we start and target, then there is nothing to do
+    if start[0] == target[0] and start[1] == target[1]:
+        return ([start])
+
+    queue = [(start, 0)]
+
+    # dictionary to trace back (save parent node)
+    parent = {start: None}
+
+    # Initialize the cost from start to a node (g)
+    g_score = {}
+    g_score[start] = 0
+
+    # Initialize the estimated total cost (f = g + h)
+    f_score = {}
+    f_score[start] = heuristic2(start, target)
+
+    while queue:
+
+        #print(f"queue: {queue}")
+        current_tup = min(queue, key=lambda t: t[1])
+        queue.remove(current_tup)
+
+        current = current_tup[0]
+        #print(f"current {current}")
+
+        # check if current is target
+        if current[0] == target[0] and current[1] == target[1]:
+            path = []
+            while current:
+                path.append(current)
+                current = parent[current]
+            path.reverse()
+            # path.append(neighbour)
+            #print(f"Path found from goal to target with A_Start Search: {path}")
+            return path, len(parent), len(queue)
+
+        for neighbour in get_neighbours(current, cols, rows):
+            # only use neigbhours that are not yet visited
+            if neighbour not in parent:
+
+                #print(f"Current neighbour: {neighbour}")
+                # Calculate tentative g_score (current cost to reach this neighbor)
+                current_g = g_score[current] + distance(current, neighbour, search_space)
+
+                if neighbour not in queue or (current_g < g_score.get(neighbour, float('inf'))):
+                    # Record the best path so far
+                    parent[neighbour] = current
+                    g_score[neighbour] = current_g
+                    f_score[neighbour] = current_g + heuristic2(neighbour, target)
+
+                    if neighbour not in queue:
+                        queue.append((neighbour, f_score[neighbour]))
 
 
-# Reconstruct the path from start to goal
-def reconstruct_path(came_from, start, goal):
-    current = goal
-    path = []
-    while current != start:
-        path.append(current)
-        current = came_from[current]
-    path.reverse()
-    return path
+def distance(current, neighbour, search_space):
+    if current[2] != neighbour[2]:
+        return 1
+    else:
+        # print(search_space[neighbour[0]][neighbour[1]])
+        return search_space[neighbour[0]][neighbour[1]]
 
 
-# Main function to run the program
 def main(input_file):
     with open(input_file, 'r') as file:
-        input_data = file.read()
+        lines = file.read()
 
-    # Parsing input
-    lines = input_data.strip().split("\n")
+    lines = lines.split("\n")
 
-    # Grid size
-    n, m = map(int, lines[0].split())
+    new_lines = []
+    for line in lines:
+        new_line = line.split()
+        for i in range(len(new_line)):
+            new_line[i] = int(new_line[i])
+        new_lines.append(new_line)
 
-    # Grid map
-    grid = [list(map(int, lines[i + 1].split())) for i in range(n)]
+    lines = new_lines
 
-    # Initial position (x, y, orientation)
-    x_start, y_start, orientation_start = map(int, lines[n + 1].split())
+    in1 = lines[0]
 
-    # Target position (x, y, orientation)
-    x_goal, y_goal, orientation_goal = map(int, lines[n + 2].split())
+    rows = int(in1[0])
+    cols = int(in1[1])
 
-    start = (x_start, y_start, orientation_start)
-    goal = (x_goal, y_goal, orientation_goal)
+    n = rows
+    i = 1
+    search_space = []
 
-    # Run A* algorithm
-    path = astar(grid, start, goal)
+    while (n > 0):
+        search_space.append(lines[i])
+        i += 1
+        n -= 1
 
-    # Output the result
-    if path:
-        print("Path found:", path)
-    else:
-        print("No path found")
+    print("Search Space:")
+    for line in search_space:
+        print(line)
+
+    start_position = tuple(lines[i])
+    end_position = tuple(lines[i + 1])
+
+    print("")
+    print(f"start position: {start_position}")
+    print(f"end position: {end_position}")
+    print("")
+
+    path,explored,frontier = (aStar_2(start_position, end_position, cols, rows, search_space))
+    print(path)
+    print()
+    depth, cost = trace_back(path, search_space, True, heuristic2)
+    print(f"\nNumber of items in explored list: {explored}")
+    print(f"Number of items in frontier: {frontier}")
+
+    return (depth, cost, explored,explored)
+
+
 
