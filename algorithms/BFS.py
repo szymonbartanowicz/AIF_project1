@@ -1,44 +1,5 @@
-import sys
-
-
-def get_neighbours(position, cols, rows):
-    x, y, d = position
-
-    neighbours = []
-
-    # Turn:
-    rd = (d - 1) % 8
-    ld = (d + 1) % 8
-
-    neighbours.append((x, y, rd))
-    neighbours.append((x, y, ld))
-
-    # Drill in direction currently facing:
-    if d == 0:
-        x -= 1
-    elif d == 1:
-        x -= 1
-        y += 1
-    elif d == 2:
-        y += 1
-    elif d == 3:
-        x += 1
-        y += 1
-    elif d == 4:
-        x += 1
-    elif d == 5:
-        x += 1
-        y -= 1
-    elif d == 6:
-        y -= 1
-    elif d == 7:
-        y -= 1
-        x -= 1
-
-    if ((x >= 0 and x < cols) and (y >= 0 and y < rows)):
-        neighbours.append((x, y, d))
-
-    return (neighbours)
+from utils.get_neighbours import get_neighbours
+from utils.traceback import trace_back
 
 
 def bfs(start, target, cols, rows):
@@ -77,7 +38,6 @@ def bfs(start, target, cols, rows):
         print(f"current queue: {queue}")
     return False
 
-
 def main(input_file):
     with open(input_file, 'r') as file:
         lines = file.read()
@@ -98,11 +58,11 @@ def main(input_file):
     rows = int(in1[0])
     cols = int(in1[1])
 
-    n = cols
+    n = rows
     i = 1
     search_space = []
 
-    while (n > 1):
+    while (n > 0):
         search_space.append(lines[i])
         i += 1
         n -= 1
@@ -111,7 +71,6 @@ def main(input_file):
     for line in search_space:
         print(line)
 
-    print(lines)
     start_position = tuple(lines[i])
     end_position = tuple(lines[i + 1])
 
@@ -121,4 +80,8 @@ def main(input_file):
     print("")
 
     # We start searching bfs
-    bfs(start_position, end_position, cols, rows)
+    path = (bfs(start_position, end_position, cols, rows))
+    trace_back(path, search_space)
+    print(path)
+
+

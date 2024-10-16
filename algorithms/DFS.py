@@ -1,85 +1,5 @@
-import sys
-
-
-def get_neighbours(position, cols, rows):
-    x, y, d = position
-
-    xx = x
-    yy = y
-
-    neighbours = []
-
-    # Drill in direction currently facing:
-    if d == 0:
-        x -= 1
-    elif d == 1:
-        x -= 1
-        y += 1
-    elif d == 2:
-        y += 1
-    elif d == 3:
-        x += 1
-        y += 1
-    elif d == 4:
-        x += 1
-    elif d == 5:
-        x += 1
-        y -= 1
-    elif d == 6:
-        y -= 1
-    elif d == 7:
-        y -= 1
-        x -= 1
-
-    if ((x >= 0 and x < cols) and (y >= 0 and y < rows)):
-        neighbours.append((x, y, d))
-
-    # Turn:
-    rd = (d - 1) % 8
-    ld = (d + 1) % 8
-
-    neighbours.append((xx, yy, rd))
-    neighbours.append((xx, yy, ld))
-
-    return (neighbours)
-
-
-def bfs(start, target, cols, rows):
-    # Check if we start and target, then there is nothing to do
-    if start[0] == target[0] and start[1] == target[1]:
-        return ([start])
-
-    # fifo queue to expand frontier
-    queue = [start]
-
-    # dictionary to trace back (save parent node)
-    parent = {start: None}
-
-    while queue:
-        current = queue.pop(0)
-
-        # find the neigbhours of current node
-        for neighbour in get_neighbours(current, cols, rows):
-            # only use neigbhours that are not yet visited
-            if neighbour not in parent:
-                # check if neigbhour is the target
-                if not (neighbour[0] == target[0] and neighbour[1] == target[1]):
-                    # if not append to queue and set current node as its parent
-                    queue.append(neighbour)
-                    parent[neighbour] = current
-                else:
-                    # if yes we found a solution and trace back to print the path
-                    path = []
-                    while current:
-                        path.append(current)
-                        current = parent[current]
-                    path.reverse()
-                    path.append(neighbour)
-                    print(f"Path found from goal to target with BFS Search: {path}")
-                    return path
-        print(f"current queue: {queue}")
-    return False
-
+from utils.get_neighbours import get_neighbours
+from utils.traceback import trace_back
 
 def dfs_recursive(current, target, cols, rows, parent):
     if (current[0] == target[0] and current[1] == target[1]):
@@ -88,8 +8,7 @@ def dfs_recursive(current, target, cols, rows, parent):
             path.append(current)
             current = parent[current]
         path.reverse()
-        path.append(current)
-        print(parent)
+        # path.append(current)
         # print(f"Path found from goal to target with DFS Search: {path}")
         return path
     else:
@@ -138,11 +57,11 @@ def main(input_file):
     rows = int(in1[0])
     cols = int(in1[1])
 
-    n = cols
+    n = rows
     i = 1
     search_space = []
 
-    while (n > 1):
+    while (n > 0):
         search_space.append(lines[i])
         i += 1
         n -= 1
@@ -151,7 +70,6 @@ def main(input_file):
     for line in search_space:
         print(line)
 
-    print(lines)
     start_position = tuple(lines[i])
     end_position = tuple(lines[i + 1])
 
@@ -161,9 +79,7 @@ def main(input_file):
     print("")
 
     # We start searching bfs
-    # bfs(start_position, end_position, cols, rows)
-
-    dfs(start_position, end_position, cols, rows)
-
-
+    path = (dfs(start_position, end_position, cols, rows))
+    trace_back(path, search_space)
+    print(path)
 

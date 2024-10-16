@@ -1,84 +1,6 @@
 import sys
-
-
-def trace_back(path, search_space, heuristic=False):
-    # uniformed search:
-    if heuristic == False:
-
-        print("Representation of each Node:")
-        print("(Depth, Cost, Operation, State)")
-        cost = 0
-        operation = "None"
-        n = len(path)
-        for i in range(n):
-            print(f"({i}, {cost}, {operation},{path[i]})")
-
-            if (i + 1 < n):
-                ox, oy, od, = path[i]
-                nx, ny, nd = path[i + 1]
-
-                if (ox != nx or oy != ny):
-                    operation = "Drill"
-                    cost += search_space[nx][ny]
-                elif ((od + 1) == nd):
-                    operation = "Rotate Clockwise"
-                    cost += 1
-                elif ((od - 7) == nd):
-                    operation = "Rotate Clockwise"
-                    cost += 1
-                elif ((od - 1) == nd):
-                    operation = "Rotate Counter Clockwise"
-                    cost += 1
-                elif ((od + 7) == nd):
-                    operation = "Rotate Counter Clockwise"
-                    cost += 1
-                else:
-                    print("Traceback failed")
-                    break
-    print("Total cost: ", cost)
-
-
-def get_neighbours(position, cols, rows):
-    x, y, d = position
-
-    xx = x
-    yy = y
-
-    neighbours = []
-
-    # Drill in direction currently facing:
-    if d == 0:
-        x -= 1
-    elif d == 1:
-        x -= 1
-        y += 1
-    elif d == 2:
-        y += 1
-    elif d == 3:
-        x += 1
-        y += 1
-    elif d == 4:
-        x += 1
-    elif d == 5:
-        x += 1
-        y -= 1
-    elif d == 6:
-        y -= 1
-    elif d == 7:
-        y -= 1
-        x -= 1
-
-    if ((x >= 0 and x < rows) and (y >= 0 and y < cols)):
-        neighbours.append((x, y, d))
-
-    # Turn:
-    rd = (d - 1) % 8
-    ld = (d + 1) % 8
-
-    neighbours.append((xx, yy, rd))
-    neighbours.append((xx, yy, ld))
-
-    return (neighbours)
+from utils.get_neighbours import get_neighbours
+from utils.traceback import trace_back
 
 
 def bfs(start, target, cols, rows):
@@ -202,18 +124,5 @@ def main(input_file):
     path = (dfs(start_position, end_position, cols, rows))
     print(path)
     trace_back(path, search_space)
-
-
-if __name__ == "__main__":
-    # Get the arguments passed from the command line
-    input_file = sys.argv[1]
-
-    try:
-        option = sys.argv[2]
-    except:
-        option = "None"
-
-    # Call the main function with the passed arguments
-    main(input_file)
 
 

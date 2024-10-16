@@ -36,7 +36,7 @@ class MapGenerator:
 
 def main():
     sizes = MAP_SIZES
-    output_dir = "inputs/"
+    output_dir = "../inputs/"
 
     if os.path.exists(output_dir):
         shutil.rmtree(output_dir)
