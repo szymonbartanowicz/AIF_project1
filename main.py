@@ -33,11 +33,18 @@ def main():
     print(f"Processing file: {input_file}...")
 
     try:
-        algorithm_module = importlib.import_module(f"algorithms.{algorithm}")
-        stats = algorithm_module.main(input_path)
-        print(stats)
+        a_module = importlib.import_module("algorithms.A")
 
-        # Save the stats to TSV
+        if algorithm == "A1":
+            heuristic = a_module.heuristic1
+            stats = a_module.main(input_path, heuristic)
+        elif algorithm == "A2":
+            heuristic = a_module.heuristic2
+            stats = a_module.main(input_path, heuristic)
+        else:
+            algorithm_module = importlib.import_module(f"algorithms.{algorithm}")
+            stats = algorithm_module.main(input_path)
+
         save_stats_to_tsv(algorithm, input_file, stats)
 
     except ModuleNotFoundError:

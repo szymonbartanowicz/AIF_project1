@@ -1,6 +1,4 @@
 import os
-import sys
-sys.path.append('/Users/szymonbartanowicz/studia/udc_1/AIF_project1')
 from constants import ALGORITHMS, INPUTS_DIR
 
 
